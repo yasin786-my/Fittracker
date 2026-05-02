@@ -320,6 +320,11 @@ server {
 | Icons | lucide-react |
 | Toasts | react-hot-toast |
 
+
+
+---
+
+
 ## 📜 License
 Copyright (c) 2024
 This project is open-source and available under the MIT License.
