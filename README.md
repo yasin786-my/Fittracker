@@ -319,3 +319,12 @@ server {
 | Charts | Recharts |
 | Icons | lucide-react |
 | Toasts | react-hot-toast |
+
+## 📜 License
+Copyright (c) 2024
+This project is open-source and available under the MIT License.
+
+---
+
+### 📝 Note
+This project was built for educational purposes to understand the "behind the scenes" of web development before moving on to more advanced frameworks.
