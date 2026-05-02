@@ -1,0 +1,46 @@
+# --- General ---
+.DS_Store
+.env
+.env.local
+*.log
+__pycache__/
+.vscode/
+.idea/
+
+# --- Backend (Python/Flask) ---
+backend/venv/
+backend/env/
+backend/ENV/
+backend/.pytest_cache/
+backend/*.pyc
+backend/*.pyo
+backend/*.db
+backend/instance/
+
+# Flask-Migrate / Alembic
+# Note: Usually you DO commit the 'backend/migrations/' folder 
+# but you exclude the pyc files inside it.
+backend/migrations/__pycache__/
+
+# --- Frontend (Node/React/Vite) ---
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+frontend/*.local
+frontend/.eslintcache
+
+# Vite specific
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+
+# --- Database ---
+# Local MySQL dumps or SQLite files if used for testing
+*.sql
+*.sqlite3
+
+# --- System & IDE ---
+.python-version
+.ipynb_checkpoints
+.history/
