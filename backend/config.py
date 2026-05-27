@@ -16,9 +16,7 @@ class Config:
 
     # Database
     SQLALCHEMY_DATABASE_URI: str = os.environ.get(
-        "DATABASE_URL",
-        "mysql://fittracker:fittracker_pass@localhost:3306/fittracker_db",
-    )
+        "DATABASE_URL" )
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
     SQLALCHEMY_ENGINE_OPTIONS: dict = {
         "pool_pre_ping": True,
