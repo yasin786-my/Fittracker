@@ -17,10 +17,14 @@ function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-950">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#0D0D1A' }}>
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 rounded-full border-4 border-brand-500 border-t-transparent animate-spin" />
-          <p className="text-slate-500 font-body text-sm">Loading...</p>
+          <div className="w-14 h-14 rounded-full border-4 border-max-accent border-t-transparent animate-spin"
+            style={{ boxShadow: '0 0 20px rgba(255,58,242,0.5), 0 0 40px rgba(0,245,212,0.3)' }}
+          />
+          <p className="font-display font-bold text-max-accent text-sm uppercase tracking-widest text-shadow-single">
+            Loading...
+          </p>
         </div>
       </div>
     )
@@ -119,13 +123,15 @@ export default function App() {
           <Toaster
             position="top-center"
             toastOptions={{
-              className: 'font-body text-sm',
+              className: 'font-body font-bold text-sm',
               style: {
-                background: 'rgb(var(--card, 255 255 255))',
-                color: 'rgb(var(--text, 15 23 42))',
-                border: '1px solid rgb(var(--border, 226 232 240))',
-                borderRadius: '12px',
-                boxShadow: '0 4px 24px rgba(0,0,0,0.08)',
+                background: 'rgba(45, 27, 78, 0.95)',
+                color: '#FFFFFF',
+                border: '4px solid #FF3AF2',
+                borderRadius: '9999px',
+                boxShadow: '0 0 20px rgba(255,58,242,0.4), 8px 8px 0 #7B2FFF',
+                textShadow: '1px 1px 0 #7B2FFF',
+                padding: '12px 24px',
               },
               duration: 3500,
             }}

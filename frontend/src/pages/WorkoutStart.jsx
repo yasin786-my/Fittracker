@@ -4,31 +4,42 @@ import { motion } from 'framer-motion'
 import { ArrowLeft } from 'lucide-react'
 import toast from 'react-hot-toast'
 import api from '../api/client'
+import FloatingShapes from '../components/ui/FloatingShapes'
+
+const ACCENTS = ['#FF3AF2', '#00F5D4', '#FFE600', '#FF6B35', '#7B2FFF']
+const BORDERS = ['#FFE600', '#FF3AF2', '#7B2FFF', '#00F5D4', '#FF6B35']
+const SHADOWS = [
+  '8px 8px 0 #FFE600, 16px 16px 0 #7B2FFF',
+  '8px 8px 0 #FF3AF2, 16px 16px 0 #FF6B35',
+  '8px 8px 0 #7B2FFF, 16px 16px 0 #FF3AF2',
+  '8px 8px 0 #00F5D4, 16px 16px 0 #FFE600',
+  '8px 8px 0 #FF6B35, 16px 16px 0 #00F5D4',
+  '8px 8px 0 #FFE600, 16px 16px 0 #FF3AF2',
+  '8px 8px 0 #FF3AF2, 16px 16px 0 #7B2FFF',
+  '8px 8px 0 #7B2FFF, 16px 16px 0 #FF6B35',
+]
 
 const QUICK_TYPES = [
-  { type: 'Walk', emoji: '🚶', desc: 'Easy pace, low impact', color: '#22c55e', bgLight: '#f0fdf4', bgDark: 'rgba(34,197,94,0.15)' },
-  { type: 'Run', emoji: '🏃', desc: 'Cardio boost, burn fat', color: '#3b82f6', bgLight: '#eff6ff', bgDark: 'rgba(59,130,246,0.15)' },
-  { type: 'Strength', emoji: '💪', desc: 'Lift, build, grow', color: '#f97316', bgLight: '#fff7ed', bgDark: 'rgba(249,115,22,0.15)' },
-  { type: 'HIIT', emoji: '🔥', desc: 'High intensity intervals', color: '#ef4444', bgLight: '#fef2f2', bgDark: 'rgba(239,68,68,0.15)' },
-  { type: 'Yoga', emoji: '🧘', desc: 'Flow, stretch, breathe', color: '#8b5cf6', bgLight: '#f5f3ff', bgDark: 'rgba(139,92,246,0.15)' },
-  { type: 'Cycling', emoji: '🚴', desc: 'Pedal your way to fit', color: '#0ea5e9', bgLight: '#f0f9ff', bgDark: 'rgba(14,165,233,0.15)' },
-  { type: 'Swimming', emoji: '🏊', desc: 'Full body, easy joints', color: '#06b6d4', bgLight: '#ecfeff', bgDark: 'rgba(6,182,212,0.15)' },
-  { type: 'Custom', emoji: '⚡', desc: 'Define your own session', color: '#94a3b8', bgLight: '#f8fafc', bgDark: 'rgba(148,163,184,0.15)' },
+  { type: 'Walk', emoji: '🚶', desc: 'Easy pace, low impact' },
+  { type: 'Run', emoji: '🏃', desc: 'Cardio boost, burn fat' },
+  { type: 'Strength', emoji: '💪', desc: 'Lift, build, grow' },
+  { type: 'HIIT', emoji: '🔥', desc: 'High intensity intervals' },
+  { type: 'Yoga', emoji: '🧘', desc: 'Flow, stretch, breathe' },
+  { type: 'Cycling', emoji: '🚴', desc: 'Pedal your way to fit' },
+  { type: 'Swimming', emoji: '🏊', desc: 'Full body, easy joints' },
+  { type: 'Custom', emoji: '⚡', desc: 'Define your own session' },
 ]
 
 export default function WorkoutStart() {
   const navigate = useNavigate()
   const [starting, setStarting] = useState(null)
-  const isDark = document.documentElement.classList.contains('dark')
 
   const handleStart = async (type) => {
     setStarting(type)
     try {
       const res = await api.post('/workouts/start', { workout_type: type })
       const session = res.data.session
-      navigate(`/workout/active/${session.id}`, {
-        state: { session, workout_type: type },
-      })
+      navigate(`/workout/active/${session.id}`, { state: { session, workout_type: type } })
     } catch {
       toast.error('Could not start session. Please try again.')
       setStarting(null)
@@ -36,67 +47,75 @@ export default function WorkoutStart() {
   }
 
   return (
-    <div className="page">
+    <div className="page relative">
+      <FloatingShapes seed={5} count={6} />
+
       {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
-        <button
-          onClick={() => navigate('/')}
-          className="btn-ghost p-2 -ml-2"
-        >
-          <ArrowLeft size={20} />
+      <div className="flex items-center gap-3 mb-8 relative z-10">
+        <button onClick={() => navigate('/')} className="w-11 h-11 rounded-full flex items-center justify-center transition-all hover:scale-110"
+          style={{ background: 'rgba(45,27,78,0.8)', border: '4px solid #FF3AF2', boxShadow: '4px 4px 0 #FFE600' }}>
+          <ArrowLeft size={18} style={{ color: '#FF3AF2' }} />
         </button>
         <div>
-          <h1 className="font-display text-2xl font-bold text-slate-900 dark:text-white">Start Workout</h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400">What are you doing today?</p>
+          <h1 className="font-display font-black text-3xl text-white text-shadow-triple leading-tight">START WORKOUT</h1>
+          <p className="text-sm font-display font-bold uppercase tracking-widest" style={{ color: '#00F5D4' }}>What are you crushing today?</p>
         </div>
       </div>
 
-      {/* Quick types grid */}
-      <p className="text-xs font-display font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3">
-        Quick Start
+      <p className="text-xs font-display font-black uppercase tracking-widest mb-4 relative z-10" style={{ color: '#FFE600', textShadow: '1px 1px 0 #FF3AF2' }}>
+        ⚡ QUICK START
       </p>
-      <div className="grid grid-cols-2 gap-3">
-        {QUICK_TYPES.map((wt, i) => (
-          <motion.button
-            key={wt.type}
-            initial={{ y: 16, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: i * 0.05 }}
-            whileTap={{ scale: 0.96 }}
-            onClick={() => handleStart(wt.type)}
-            disabled={!!starting}
-            className="card p-4 flex flex-col items-start gap-2 text-left hover:shadow-md transition-all duration-150 active:scale-95 disabled:opacity-60"
-            style={{
-              borderColor: starting === wt.type ? wt.color : undefined,
-              backgroundColor: starting === wt.type
-                ? (isDark ? wt.bgDark : wt.bgLight)
-                : undefined,
-            }}
-          >
-            {starting === wt.type ? (
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center"
-                style={{ backgroundColor: isDark ? wt.bgDark : wt.bgLight }}
-              >
-                <div
-                  className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin"
-                  style={{ borderColor: `${wt.color}40`, borderTopColor: wt.color }}
-                />
+
+      <div className="grid grid-cols-2 gap-4 relative z-10">
+        {QUICK_TYPES.map((wt, i) => {
+          const accent = ACCENTS[i % 5]
+          const border = BORDERS[i % 5]
+          const shadow = SHADOWS[i % 8]
+          const rot = i % 2 === 0 ? 'rotate-1' : '-rotate-1'
+          const isStarting = starting === wt.type
+
+          return (
+            <motion.button
+              key={wt.type}
+              initial={{ y: 20, opacity: 0, rotate: i % 2 === 0 ? 3 : -3 }}
+              animate={{ y: 0, opacity: 1, rotate: 0 }}
+              transition={{ delay: i * 0.06, type: 'spring' }}
+              whileHover={{ scale: 1.05, rotate: i % 2 === 0 ? 2 : -2 }}
+              whileTap={{ scale: 0.93 }}
+              onClick={() => handleStart(wt.type)}
+              disabled={!!starting}
+              className={`relative overflow-hidden flex flex-col items-start gap-3 text-left disabled:opacity-60 ${rot}`}
+              style={{
+                background: isStarting ? `${accent}20` : 'rgba(45,27,78,0.85)',
+                border: `4px solid ${isStarting ? accent : border}`,
+                borderRadius: '20px',
+                boxShadow: shadow,
+                padding: '18px',
+                minHeight: '120px',
+                transition: 'all 250ms cubic-bezier(0.68,-0.55,0.265,1.55)',
+              }}
+            >
+              <div className="absolute inset-0 opacity-10" style={{ backgroundImage: `radial-gradient(circle, ${accent} 1px, transparent 1px)`, backgroundSize: '18px 18px' }} />
+
+              {isStarting ? (
+                <div className="w-12 h-12 rounded-full flex items-center justify-center relative z-10"
+                  style={{ background: `${accent}25`, border: `3px solid ${accent}` }}>
+                  <div className="w-5 h-5 rounded-full animate-spin border-2 border-t-transparent" style={{ borderColor: `${accent}40`, borderTopColor: accent }} />
+                </div>
+              ) : (
+                <div className="relative z-10 w-12 h-12 rounded-full flex items-center justify-center text-2xl animate-bounce-subtle"
+                  style={{ background: `${accent}20`, border: `3px solid ${accent}` }}>
+                  {wt.emoji}
+                </div>
+              )}
+
+              <div className="relative z-10">
+                <p className="font-display font-black text-base text-white" style={{ textShadow: `1px 1px 0 ${border}` }}>{wt.type.toUpperCase()}</p>
+                <p className="text-xs font-body leading-snug" style={{ color: `${accent}cc` }}>{wt.desc}</p>
               </div>
-            ) : (
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center text-2xl"
-                style={{ backgroundColor: isDark ? wt.bgDark : wt.bgLight }}
-              >
-                {wt.emoji}
-              </div>
-            )}
-            <div>
-              <p className="font-display font-semibold text-sm text-slate-900 dark:text-white">{wt.type}</p>
-              <p className="text-xs text-slate-500 dark:text-slate-400 leading-snug">{wt.desc}</p>
-            </div>
-          </motion.button>
-        ))}
+            </motion.button>
+          )
+        })}
       </div>
     </div>
   )

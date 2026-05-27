@@ -2,22 +2,14 @@ import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 
 /**
- * Animated circular progress ring using SVG + framer-motion
- * Props:
- *  - pct: 0-100
- *  - size: px (default 200)
- *  - strokeWidth: px (default 14)
- *  - color: tailwind/CSS color (default brand green)
- *  - trackColor: background ring color
- *  - label: center label text
- *  - sublabel: center sublabel text
- *  - children: override center content
+ * Animated circular progress ring — MAXIMALISM edition
+ * Multi-color glow, gradient stroke, bold center text with text shadows
  */
 export default function ProgressRing({
   pct = 0,
   size = 200,
-  strokeWidth = 14,
-  color = '#22c55e',
+  strokeWidth = 16,
+  color = '#FF3AF2',
   trackColor,
   label,
   sublabel,
@@ -31,31 +23,39 @@ export default function ProgressRing({
   const offset = circumference - (animatedPct / 100) * circumference
 
   useEffect(() => {
-    // Animate to target pct on mount/change
     const timer = setTimeout(() => {
       setAnimatedPct(Math.max(0, Math.min(100, pct)))
     }, 100)
     return () => clearTimeout(timer)
   }, [pct])
 
-  const isDark = document.documentElement.classList.contains('dark')
-  const defaultTrack = isDark ? '#1e293b' : '#f1f5f9'
+  const gradientId = `ring-gradient-${Math.random().toString(36).slice(2, 6)}`
 
   return (
-    <div className={`relative inline-flex items-center justify-center ${className}`} style={{ width: size, height: size }}>
+    <div
+      className={`relative inline-flex items-center justify-center ${className}`}
+      style={{ width: size, height: size }}
+    >
       <svg
         width={size}
         height={size}
         className="-rotate-90"
         viewBox={`0 0 ${size} ${size}`}
       >
+        <defs>
+          <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#FF3AF2" />
+            <stop offset="50%" stopColor="#00F5D4" />
+            <stop offset="100%" stopColor="#FFE600" />
+          </linearGradient>
+        </defs>
         {/* Track */}
         <circle
           cx={size / 2}
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke={trackColor || defaultTrack}
+          stroke={trackColor || '#2D1B4E'}
           strokeWidth={strokeWidth}
           strokeLinecap="round"
         />
@@ -65,7 +65,7 @@ export default function ProgressRing({
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke={color}
+          stroke={`url(#${gradientId})`}
           strokeWidth={strokeWidth}
           strokeLinecap="round"
           strokeDasharray={circumference}
@@ -73,7 +73,7 @@ export default function ProgressRing({
           animate={{ strokeDashoffset: offset }}
           transition={{ duration: 1.2, ease: [0.4, 0, 0.2, 1] }}
           style={{
-            filter: `drop-shadow(0 0 6px ${color}60)`,
+            filter: `drop-shadow(0 0 8px ${color}80) drop-shadow(0 0 20px ${color}40)`,
           }}
         />
       </svg>
@@ -87,17 +87,17 @@ export default function ProgressRing({
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.3, duration: 0.4 }}
-              className="font-display font-bold text-4xl text-slate-900 dark:text-white leading-none"
+              className="font-display font-black text-4xl text-white leading-none text-shadow-double"
             >
               {Math.round(animatedPct)}%
             </motion.span>
             {label && (
-              <span className="font-body text-xs text-slate-500 dark:text-slate-400 mt-1">
+              <span className="font-display font-bold text-xs text-max-accent uppercase tracking-widest mt-1">
                 {label}
               </span>
             )}
             {sublabel && (
-              <span className="font-body text-[10px] text-slate-400 dark:text-slate-500">
+              <span className="font-body text-[10px] text-white/50">
                 {sublabel}
               </span>
             )}

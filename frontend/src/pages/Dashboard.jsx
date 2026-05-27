@@ -7,43 +7,67 @@ import api from '../api/client'
 import { useAuth } from '../context/AuthContext'
 import ProgressRing from '../components/ui/ProgressRing'
 import CountUp from '../components/ui/CountUp'
+import FloatingShapes from '../components/ui/FloatingShapes'
+
+const ACCENTS = ['#FF3AF2', '#00F5D4', '#FFE600', '#FF6B35', '#7B2FFF']
+const BORDERS = ['#FFE600', '#FF3AF2', '#7B2FFF', '#00F5D4', '#FF6B35']
+const SHADOWS = [
+  '8px 8px 0 #FFE600, 16px 16px 0 #7B2FFF',
+  '8px 8px 0 #FF3AF2, 16px 16px 0 #00F5D4',
+  '8px 8px 0 #7B2FFF, 16px 16px 0 #FF6B35',
+  '8px 8px 0 #00F5D4, 16px 16px 0 #FF3AF2',
+  '8px 8px 0 #FF6B35, 16px 16px 0 #FFE600',
+]
 
 function ReadinessBar({ score = 50 }) {
-  const color = score >= 70 ? '#22c55e' : score >= 40 ? '#f97316' : '#ef4444'
-  const label = score >= 70 ? 'High' : score >= 40 ? 'Moderate' : 'Low'
+  const color = score >= 70 ? '#00F5D4' : score >= 40 ? '#FF6B35' : '#FF3AF2'
+  const label = score >= 70 ? 'HIGH ⚡' : score >= 40 ? 'MODERATE 🔥' : 'LOW 💫'
   return (
-    <div className="flex items-center gap-2">
-      <div className="flex-1 h-2 rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden">
+    <div className="flex items-center gap-3">
+      <div className="flex-1 h-3 rounded-full overflow-hidden" style={{ background: 'rgba(45,27,78,0.8)', border: '2px solid rgba(255,58,242,0.3)' }}>
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${score}%` }}
-          transition={{ duration: 1, ease: 'easeOut', delay: 0.4 }}
+          transition={{ duration: 1.2, ease: 'easeOut', delay: 0.4 }}
           className="h-full rounded-full"
-          style={{ backgroundColor: color }}
+          style={{ background: `linear-gradient(90deg, ${color}, ${ACCENTS[2]})`, boxShadow: `0 0 10px ${color}80` }}
         />
       </div>
-      <span className="text-xs font-display font-semibold" style={{ color }}>{label}</span>
+      <span className="text-xs font-display font-black tracking-widest" style={{ color, textShadow: `1px 1px 0 #0D0D1A` }}>{label}</span>
     </div>
   )
 }
 
-function StatCard({ icon: Icon, label, value, unit, suffix, color, delay = 0 }) {
+function StatCard({ icon: Icon, label, value, unit, color, delay = 0, idx = 0 }) {
+  const accent = ACCENTS[idx % 5]
+  const border = BORDERS[idx % 5]
+  const shadow = SHADOWS[idx % 5]
+  const rot = idx % 2 === 0 ? 'rotate-1' : '-rotate-1'
   return (
     <motion.div
-      initial={{ y: 16, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ delay, duration: 0.4 }}
-      className="stat-card"
+      initial={{ y: 20, opacity: 0, rotate: idx % 2 === 0 ? 2 : -2 }}
+      animate={{ y: 0, opacity: 1, rotate: 0 }}
+      transition={{ delay, duration: 0.4, type: 'spring' }}
+      whileHover={{ scale: 1.05, rotate: idx % 2 === 0 ? 2 : -2 }}
+      className={`relative overflow-hidden ${rot}`}
+      style={{
+        background: 'rgba(45,27,78,0.85)',
+        border: `4px solid ${border}`,
+        borderRadius: '20px',
+        boxShadow: shadow,
+        padding: '16px',
+      }}
     >
-      <div className="flex items-center gap-2 mb-1">
-        <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${color}20` }}>
-          <Icon size={15} style={{ color }} />
+      <div className="absolute inset-0 opacity-10" style={{ backgroundImage: `radial-gradient(circle, ${accent} 1px, transparent 1px)`, backgroundSize: '16px 16px' }} />
+      <div className="relative z-10 flex items-center gap-2 mb-2">
+        <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: `${accent}25`, border: `2px solid ${accent}` }}>
+          <Icon size={16} style={{ color: accent }} strokeWidth={2.5} />
         </div>
-        <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">{label}</span>
+        <span className="text-xs font-display font-bold uppercase tracking-widest" style={{ color: accent }}>{label}</span>
       </div>
-      <div className="font-display font-bold text-xl text-slate-900 dark:text-white">
+      <div className="relative z-10 font-display font-black text-2xl text-white" style={{ textShadow: `2px 2px 0 ${border}` }}>
         <CountUp target={value} />
-        {unit && <span className="text-sm font-normal text-slate-500 ml-1">{unit}</span>}
+        {unit && <span className="text-sm font-bold ml-1" style={{ color: accent }}>{unit}</span>}
       </div>
     </motion.div>
   )
@@ -66,23 +90,21 @@ export default function Dashboard() {
     }
   }, [])
 
-  useEffect(() => {
-    fetchDashboard()
-  }, [fetchDashboard])
+  useEffect(() => { fetchDashboard() }, [fetchDashboard])
 
   const greeting = () => {
     const h = new Date().getHours()
-    if (h < 12) return 'Good morning'
-    if (h < 17) return 'Good afternoon'
-    return 'Good evening'
+    if (h < 12) return 'GOOD MORNING'
+    if (h < 17) return 'GOOD AFTERNOON'
+    return 'GOOD EVENING'
   }
 
   if (loading) {
     return (
-      <div className="page flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-3 border-brand-500 border-t-transparent rounded-full animate-spin" />
-          <p className="text-slate-400 text-sm">Loading your day...</p>
+      <div className="page flex items-center justify-center min-h-screen">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-16 h-16 rounded-full animate-spin-slow" style={{ border: '4px solid #7B2FFF', borderTopColor: '#FF3AF2', boxShadow: '0 0 20px rgba(255,58,242,0.5)' }} />
+          <p className="font-accent text-2xl text-gradient-max">LOADING...</p>
         </div>
       </div>
     )
@@ -95,161 +117,106 @@ export default function Dashboard() {
   const streak = data?.streak || 0
   const userGoals = data?.user_goals || {}
 
-  const ringColor = goalPct >= 80 ? '#22c55e' : goalPct >= 40 ? '#f97316' : '#94a3b8'
-
   return (
-    <div className="page scrollbar-hide">
+    <div className="page scrollbar-hide relative">
+      <FloatingShapes seed={1} count={7} />
+
       {/* Header */}
-      <motion.div
-        initial={{ y: -10, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        className="flex items-start justify-between mb-6"
-      >
+      <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="flex items-start justify-between mb-6 relative z-10">
         <div>
-          <p className="text-slate-500 dark:text-slate-400 text-sm font-body">{greeting()},</p>
-          <h1 className="font-display text-2xl font-bold text-slate-900 dark:text-white">
-            {user?.name?.split(' ')[0] || 'Athlete'} 👋
+          <p className="font-display font-black text-xs uppercase tracking-widest mb-1" style={{ color: '#00F5D4' }}>{greeting()},</p>
+          <h1 className="font-display font-black text-4xl text-white text-shadow-double leading-tight">
+            {user?.name?.split(' ')[0] || 'ATHLETE'} 👋
           </h1>
         </div>
         {streak > 0 && (
           <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
+            initial={{ scale: 0, rotate: -20 }}
+            animate={{ scale: 1, rotate: 0 }}
             transition={{ type: 'spring', delay: 0.3 }}
-            className="flex items-center gap-1 bg-energy-500/10 dark:bg-energy-500/20 px-3 py-1.5 rounded-xl"
+            className="flex items-center gap-2 px-4 py-2 rounded-full"
+            style={{ background: 'rgba(45,27,78,0.9)', border: '4px solid #FFE600', boxShadow: '4px 4px 0 #FF3AF2', }}
           >
-            <span className="text-lg animate-flame">🔥</span>
-            <span className="font-display font-bold text-energy-500 text-sm">{streak}</span>
+            <span className="text-xl animate-wiggle">🔥</span>
+            <span className="font-accent text-2xl" style={{ color: '#FFE600', textShadow: '1px 1px 0 #FF3AF2' }}>{streak}</span>
           </motion.div>
         )}
       </motion.div>
 
       {/* Central Progress Ring */}
       <motion.div
-        initial={{ scale: 0.85, opacity: 0 }}
+        initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.1 }}
-        className="flex flex-col items-center mb-6"
+        transition={{ duration: 0.6, delay: 0.1 }}
+        className="flex flex-col items-center mb-6 relative z-10"
       >
-        <ProgressRing
-          pct={goalPct}
-          size={200}
-          strokeWidth={16}
-          color={ringColor}
-          className="drop-shadow-xl"
-        >
-          <div className="flex flex-col items-center justify-center">
-            <motion.span
-              key={goalPct}
-              initial={{ scale: 0.7, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              className="font-display font-extrabold text-4xl text-slate-900 dark:text-white"
-            >
-              {Math.round(goalPct)}%
-            </motion.span>
-            <span className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">daily goal</span>
-            {goalPct >= 100 && (
+        <div className="relative">
+          <div className="absolute inset-0 rounded-full animate-pulse-glow" style={{ transform: 'scale(1.1)' }} />
+          <ProgressRing pct={goalPct} size={200} strokeWidth={16} color="#FF3AF2" className="relative z-10" >
+            <div className="flex flex-col items-center justify-center">
               <motion.span
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: 'spring', delay: 0.8 }}
-                className="text-lg mt-1"
+                key={goalPct}
+                initial={{ scale: 0.7, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                className="font-accent text-5xl text-gradient-max"
               >
-                🎉
+                {Math.round(goalPct)}%
               </motion.span>
-            )}
-          </div>
-        </ProgressRing>
+              <span className="text-xs font-display font-bold uppercase tracking-widest mt-1" style={{ color: '#00F5D4' }}>DAILY GOAL</span>
+              {goalPct >= 100 && (
+                <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', delay: 0.8 }} className="text-2xl mt-1 animate-bounce-subtle">🎉</motion.span>
+              )}
+            </div>
+          </ProgressRing>
+        </div>
 
         {/* Readiness */}
-        <div className="w-full mt-4 card p-3">
-          <div className="flex justify-between items-center mb-1.5">
-            <span className="text-xs font-display font-medium text-slate-600 dark:text-slate-400 flex items-center gap-1">
-              <Zap size={12} className="text-energy-500" />
-              Energy / Readiness
+        <div className="w-full mt-4 relative overflow-hidden" style={{ background: 'rgba(45,27,78,0.8)', border: '4px solid #7B2FFF', borderRadius: '20px', boxShadow: '6px 6px 0 #00F5D4', padding: '16px' }}>
+          <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 8px, #FFE600 8px, #FFE600 16px)' }} />
+          <div className="relative z-10 flex justify-between items-center mb-2">
+            <span className="text-xs font-display font-black uppercase tracking-widest flex items-center gap-1" style={{ color: '#FFE600' }}>
+              <Zap size={12} style={{ color: '#FFE600' }} /> ENERGY / READINESS
             </span>
-            <span className="font-mono text-xs font-semibold text-slate-700 dark:text-slate-300">
-              {readiness}/100
-            </span>
+            <span className="font-accent text-lg" style={{ color: '#00F5D4' }}>{readiness}/100</span>
           </div>
           <ReadinessBar score={readiness} />
         </div>
       </motion.div>
 
       {/* Stat Cards */}
-      <div className="grid grid-cols-2 gap-3 mb-4">
-        <StatCard
-          icon={Footprints}
-          label="Steps"
-          value={summary.steps || 0}
-          color="#22c55e"
-          delay={0.2}
-        />
-        <StatCard
-          icon={Flame}
-          label="Calories"
-          value={summary.calories_burned || 0}
-          unit="kcal"
-          color="#f97316"
-          delay={0.25}
-        />
-        <StatCard
-          icon={Clock}
-          label="Active"
-          value={summary.active_minutes || 0}
-          unit="min"
-          color="#3b82f6"
-          delay={0.3}
-        />
-        <StatCard
-          icon={Moon}
-          label="Sleep"
-          value={summary.sleep_hours || 0}
-          unit="hrs"
-          color="#8b5cf6"
-          delay={0.35}
-        />
+      <div className="grid grid-cols-2 gap-4 mb-6">
+        <StatCard icon={Footprints} label="Steps" value={summary.steps || 0} color="#00F5D4" delay={0.2} idx={0} />
+        <StatCard icon={Flame} label="Calories" value={summary.calories_burned || 0} unit="kcal" color="#FF6B35" delay={0.25} idx={1} />
+        <StatCard icon={Clock} label="Active" value={summary.active_minutes || 0} unit="min" color="#FF3AF2" delay={0.3} idx={2} />
+        <StatCard icon={Moon} label="Sleep" value={summary.sleep_hours || 0} unit="hrs" color="#7B2FFF" delay={0.35} idx={3} />
       </div>
 
-      {/* Goal mini bars */}
-      <motion.div
-        initial={{ y: 12, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.4 }}
-        className="card p-4 mb-4 space-y-3"
+      {/* Goal progress bars */}
+      <motion.div initial={{ y: 16, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}
+        className="relative overflow-hidden mb-6"
+        style={{ background: 'rgba(45,27,78,0.8)', border: '4px dashed #FF3AF2', borderRadius: '20px', boxShadow: '8px 8px 0 #FFE600', padding: '20px' }}
       >
-        <p className="text-xs font-display font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Today's Progress</p>
+        <div className="absolute inset-0 opacity-8" style={{ backgroundImage: 'conic-gradient(from 90deg at 1px 1px, transparent 90deg, rgba(0,245,212,0.05) 0)', backgroundSize: '30px 30px' }} />
+        <p className="text-xs font-display font-black uppercase tracking-widest mb-4 relative z-10" style={{ color: '#FFE600', textShadow: '1px 1px 0 #FF3AF2' }}>TODAY'S PROGRESS ✨</p>
         {[
-          {
-            label: 'Steps',
-            val: summary.steps || 0,
-            goal: userGoals.daily_step_goal || 8000,
-            color: '#22c55e',
-          },
-          {
-            label: 'Active minutes',
-            val: summary.active_minutes || 0,
-            goal: userGoals.daily_active_min_goal || 30,
-            color: '#3b82f6',
-          },
-        ].map(({ label, val, goal, color }) => {
+          { label: 'Steps', val: summary.steps || 0, goal: userGoals.daily_step_goal || 8000, color: '#00F5D4', shadow: '#7B2FFF' },
+          { label: 'Active Minutes', val: summary.active_minutes || 0, goal: userGoals.daily_active_min_goal || 30, color: '#FF6B35', shadow: '#FF3AF2' },
+        ].map(({ label, val, goal, color, shadow }) => {
           const pct = Math.min(100, (val / goal) * 100)
           return (
-            <div key={label}>
-              <div className="flex justify-between text-xs mb-1">
-                <span className="text-slate-600 dark:text-slate-400">{label}</span>
-                <span className="font-display font-semibold text-slate-700 dark:text-slate-300">
-                  {val.toLocaleString()} / {goal.toLocaleString()}
-                </span>
+            <div key={label} className="mb-3 relative z-10">
+              <div className="flex justify-between text-xs mb-1.5">
+                <span className="font-display font-bold uppercase tracking-wider" style={{ color }}>{label}</span>
+                <span className="font-display font-black" style={{ color: '#FFE600' }}>{val.toLocaleString()} / {goal.toLocaleString()}</span>
               </div>
-              <div className="h-2 rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden">
+              <div className="h-4 rounded-full overflow-hidden" style={{ background: 'rgba(13,13,26,0.6)', border: `2px solid ${color}50` }}>
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${pct}%` }}
-                  transition={{ duration: 1, ease: 'easeOut', delay: 0.5 }}
+                  transition={{ duration: 1.2, ease: 'easeOut', delay: 0.6 }}
                   className="h-full rounded-full"
-                  style={{ backgroundColor: color }}
+                  style={{ background: `linear-gradient(90deg, ${color}, ${shadow})`, boxShadow: `0 0 10px ${color}80` }}
                 />
               </div>
             </div>
@@ -259,72 +226,63 @@ export default function Dashboard() {
 
       {/* Insight Card */}
       {insight.title && (
-        <motion.div
-          initial={{ y: 12, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.45 }}
-          className="card p-4 mb-6 bg-gradient-to-br from-brand-50 to-emerald-50 dark:from-brand-900/20 dark:to-emerald-900/20 border-brand-200 dark:border-brand-800"
+        <motion.div initial={{ y: 16, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.45 }}
+          className="relative overflow-hidden mb-6"
+          style={{ background: 'rgba(45,27,78,0.8)', border: '4px dashed #00F5D4', borderRadius: '20px', boxShadow: '8px 8px 0 #FF6B35', padding: '20px' }}
         >
-          <div className="flex items-start gap-3">
-            <span className="text-2xl flex-shrink-0">{insight.emoji}</span>
+          <div className="absolute top-2 right-2 opacity-20 font-accent text-6xl" style={{ color: '#00F5D4' }}>💡</div>
+          <div className="flex items-start gap-3 relative z-10">
+            <span className="text-3xl flex-shrink-0 animate-bounce-subtle">{insight.emoji}</span>
             <div className="flex-1 min-w-0">
-              <p className="font-display font-semibold text-sm text-slate-900 dark:text-white">{insight.title}</p>
-              <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5 leading-relaxed">{insight.body}</p>
+              <p className="font-display font-black text-base text-white mb-1" style={{ textShadow: '1px 1px 0 #00F5D4' }}>{insight.title}</p>
+              <p className="text-sm text-white/70 leading-relaxed font-body">{insight.body}</p>
             </div>
             {insight.suggested_workout && (
-              <button
-                onClick={() => navigate('/workout')}
-                className="flex-shrink-0 flex items-center gap-1 text-xs text-brand-600 dark:text-brand-400 font-display font-semibold"
-              >
-                Start
-                <ChevronRight size={14} />
+              <button onClick={() => navigate('/workout')} className="flex-shrink-0 flex items-center gap-1 text-xs font-display font-black uppercase tracking-wider px-3 py-1 rounded-full"
+                style={{ background: '#00F5D4', color: '#0D0D1A', border: '2px solid #FFE600' }}>
+                GO <ChevronRight size={12} />
               </button>
             )}
           </div>
         </motion.div>
       )}
 
-      {/* Start Workout FAB */}
+      {/* Start Workout Button */}
       <motion.button
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.5 }}
-        whileHover={{ scale: 1.03 }}
-        whileTap={{ scale: 0.96 }}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
         onClick={() => navigate('/workout')}
-        className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl bg-brand-500 hover:bg-brand-600 text-white font-display font-bold text-base shadow-lg shadow-brand-500/30 transition-colors animate-breathe mb-4"
+        className="btn-primary w-full flex items-center justify-center gap-3 mb-6 animate-pulse-glow"
+        style={{ fontSize: '1.1rem', padding: '18px 40px' }}
       >
-        <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center">
-          <Play size={18} fill="white" className="ml-0.5" />
+        <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center" style={{ border: '2px solid rgba(255,255,255,0.4)' }}>
+          <Play size={20} fill="white" className="ml-0.5" />
         </div>
-        Start Workout
+        START WORKOUT 🔥
       </motion.button>
 
       {/* Today's sessions */}
       {data?.sessions_today?.length > 0 && (
-        <motion.div
-          initial={{ y: 12, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.55 }}
-        >
-          <p className="text-xs font-display font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
-            Today's sessions
-          </p>
-          <div className="space-y-2">
-            {data.sessions_today.map((s) => (
-              <div key={s.id} className="card p-3 flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-brand-50 dark:bg-brand-900/30 flex items-center justify-center text-lg">
-                  {s.workout_type === 'Walk' ? '🚶' :
-                   s.workout_type === 'Run' ? '🏃' :
-                   s.workout_type === 'Strength' ? '💪' :
-                   s.workout_type === 'Yoga' ? '🧘' :
-                   s.workout_type === 'HIIT' ? '🔥' : '⚡'}
+        <motion.div initial={{ y: 16, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.55 }}>
+          <p className="text-xs font-display font-black uppercase tracking-widest mb-3" style={{ color: '#FF3AF2', textShadow: '1px 1px 0 #7B2FFF' }}>TODAY'S SESSIONS ⚡</p>
+          <div className="space-y-3">
+            {data.sessions_today.map((s, i) => (
+              <div key={s.id} className="relative overflow-hidden"
+                style={{ background: 'rgba(45,27,78,0.8)', border: `4px solid ${ACCENTS[i % 5]}`, borderRadius: '20px', boxShadow: `6px 6px 0 ${BORDERS[i % 5]}`, padding: '16px' }}>
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center text-2xl animate-bounce-subtle"
+                    style={{ background: `${ACCENTS[i % 5]}20`, border: `3px solid ${ACCENTS[i % 5]}` }}>
+                    {s.workout_type === 'Walk' ? '🚶' : s.workout_type === 'Run' ? '🏃' : s.workout_type === 'Strength' ? '💪' : s.workout_type === 'Yoga' ? '🧘' : s.workout_type === 'HIIT' ? '🔥' : '⚡'}
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-display font-black text-base text-white" style={{ textShadow: `1px 1px 0 ${ACCENTS[i % 5]}` }}>{s.workout_type}</p>
+                    <p className="text-xs font-display font-bold" style={{ color: BORDERS[i % 5] }}>{s.duration_min} min · {s.calories_burned} kcal</p>
+                  </div>
+                  <span className="font-accent text-lg" style={{ color: '#00F5D4', textShadow: '1px 1px 0 #7B2FFF' }}>DONE ✓</span>
                 </div>
-                <div className="flex-1">
-                  <p className="font-display font-semibold text-sm text-slate-900 dark:text-white">{s.workout_type}</p>
-                  <p className="text-xs text-slate-500">{s.duration_min} min · {s.calories_burned} kcal</p>
-                </div>
-                <span className="text-xs text-brand-600 dark:text-brand-400 font-medium">Done ✓</span>
               </div>
             ))}
           </div>

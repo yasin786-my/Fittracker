@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { Eye, EyeOff, Zap } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useAuth } from '../context/AuthContext'
+import FloatingShapes from '../components/ui/FloatingShapes'
 
 export default function Register() {
   const { register } = useAuth()
@@ -42,41 +43,61 @@ export default function Register() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8 bg-gradient-to-br from-brand-50 via-white to-emerald-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
-      <motion.div
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        className="mb-8 text-center"
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8 relative overflow-hidden pattern-mesh">
+      <FloatingShapes count={10} seed={99} />
+
+      {/* Massive background text */}
+      <div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-accent text-[14rem] leading-none text-max-secondary/10 pointer-events-none select-none whitespace-nowrap"
+        aria-hidden="true"
       >
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-brand-500 shadow-lg shadow-brand-500/30 mb-4">
-          <Zap size={32} className="text-white" fill="white" />
+        GO!
+      </div>
+
+      <motion.div
+        initial={{ y: -30, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        className="mb-8 text-center relative z-10"
+      >
+        <div
+          className="inline-flex items-center justify-center w-20 h-20 rounded-3xl mb-4 border-4 border-max-quaternary animate-pulse-glow"
+          style={{
+            background: 'linear-gradient(135deg, #00F5D4, #7B2FFF)',
+            boxShadow: '0 0 30px rgba(0,245,212,0.5), 8px 8px 0 #FF3AF2',
+          }}
+        >
+          <Zap size={40} className="text-white" fill="white" />
         </div>
-        <h1 className="font-display text-3xl font-bold text-slate-900 dark:text-white">FitTracker</h1>
-        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Start your journey today</p>
+        <h1 className="font-display text-5xl font-black text-white uppercase tracking-tight text-shadow-triple">
+          FitTracker
+        </h1>
+        <p className="text-max-tertiary font-display font-bold text-sm mt-2 uppercase tracking-widest">
+          Start your journey today 🚀
+        </p>
       </motion.div>
 
       <motion.div
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.1 }}
-        className="w-full max-w-sm"
+        initial={{ y: 30, opacity: 0, rotate: 1 }}
+        animate={{ y: 0, opacity: 1, rotate: 0 }}
+        transition={{ delay: 0.1, type: 'spring' }}
+        className="w-full max-w-sm relative z-10"
       >
-        <div className="card p-8">
-          <h2 className="font-display text-xl font-semibold text-slate-900 dark:text-white mb-6">
-            Create account
+        <div className="card p-8" style={{ borderColor: '#00F5D4', boxShadow: '8px 8px 0 #FF6B35, 16px 16px 0 #FF3AF2' }}>
+          <h2 className="font-display text-2xl font-black text-white mb-6 uppercase tracking-wide text-shadow-single">
+            Create account ✨
           </h2>
 
           {errors.length > 0 && (
-            <div className="mb-4 p-3 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+            <div className="mb-4 p-4 rounded-2xl border-4 border-max-quaternary" style={{ background: 'rgba(255,107,53,0.15)' }}>
               {errors.map((e, i) => (
-                <p key={i} className="text-red-600 dark:text-red-400 text-sm">{e}</p>
+                <p key={i} className="text-max-quaternary font-bold text-sm">{e}</p>
               ))}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="label">Your name</label>
+              <label className="label" style={{ color: '#00F5D4' }}>Your name</label>
               <input
                 className="input"
                 type="text"
@@ -84,10 +105,11 @@ export default function Register() {
                 value={form.name}
                 onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                 required
+                style={{ borderColor: '#00F5D4' }}
               />
             </div>
             <div>
-              <label className="label">Email</label>
+              <label className="label" style={{ color: '#00F5D4' }}>Email</label>
               <input
                 className="input"
                 type="email"
@@ -95,30 +117,32 @@ export default function Register() {
                 value={form.email}
                 onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
                 required
+                style={{ borderColor: '#00F5D4' }}
               />
             </div>
             <div>
-              <label className="label">Password</label>
+              <label className="label" style={{ color: '#00F5D4' }}>Password</label>
               <div className="relative">
                 <input
-                  className="input pr-12"
+                  className="input pr-14"
                   type={showPw ? 'text' : 'password'}
                   placeholder="Min 8 characters"
                   value={form.password}
                   onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
                   required
+                  style={{ borderColor: '#00F5D4' }}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPw((v) => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-max-secondary hover:text-max-tertiary transition-colors"
                 >
-                  {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
+                  {showPw ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
             </div>
             <div>
-              <label className="label">Confirm password</label>
+              <label className="label" style={{ color: '#00F5D4' }}>Confirm password</label>
               <input
                 className="input"
                 type={showPw ? 'text' : 'password'}
@@ -126,6 +150,7 @@ export default function Register() {
                 value={form.confirm}
                 onChange={(e) => setForm((f) => ({ ...f, confirm: e.target.value }))}
                 required
+                style={{ borderColor: '#00F5D4' }}
               />
             </div>
 
@@ -135,15 +160,15 @@ export default function Register() {
               className="btn-primary w-full flex items-center justify-center gap-2 mt-2"
             >
               {loading ? (
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : 'Create account'}
+                <div className="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : 'CREATE ACCOUNT 🚀'}
             </button>
           </form>
 
-          <p className="text-center text-sm text-slate-500 dark:text-slate-400 mt-6">
+          <p className="text-center text-sm text-white/60 mt-6 font-body">
             Already have an account?{' '}
-            <Link to="/login" className="text-brand-600 dark:text-brand-400 font-medium hover:underline">
-              Sign in
+            <Link to="/login" className="text-max-accent font-bold hover:text-max-tertiary transition-colors underline underline-offset-4 decoration-wavy decoration-max-accent/50">
+              Sign in ⚡
             </Link>
           </p>
         </div>
