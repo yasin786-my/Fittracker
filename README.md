@@ -222,7 +222,9 @@ Open browser → **http://localhost:5173**
 This project is licensed under the **MIT License**.
 
 ---
-
+## Legacy Code
+This a legacy code which offically developed at the begining of the project you to deveelop this furthure if you like this code.
+---
 <p align="center">
   Built with ❤️ for fitness enthusiasts<br/>
   <sub>Track Smarter. Move Better.</sub>
