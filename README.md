@@ -123,6 +123,7 @@ cp .env.docker .env.docker.local
 > **Important:** Change `SECRET_KEY`, `JWT_SECRET_KEY`, and `MYSQL_ROOT_PASSWORD` before deploying to production.
 
 ---
+## ⚙️ Manual Setup
 
 ## 🗄️ Database Setup
 
