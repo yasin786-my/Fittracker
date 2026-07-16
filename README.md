@@ -13,6 +13,7 @@
   <img src="https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react" />
   <img src="https://img.shields.io/badge/MySQL-8.0-4479A1?style=flat-square&logo=mysql" />
   <img src="https://img.shields.io/badge/Tailwind_CSS-3-06B6D4?style=flat-square&logo=tailwindcss" />
+  <img src="https://img.shields.io/badge/Docker-Compose-2496ED?style=flat-square&logo=docker" />
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=flat-square" />
 </p>
 
@@ -21,7 +22,11 @@
 ## 📁 Project Structure
 ```
 fittracker/
+├── docker-compose.yml
+├── .env.docker
 ├── backend/
+│   ├── Dockerfile
+│   ├── .dockerignore
 │   ├── app/
 │   │   ├── __init__.py
 │   │   ├── models.py
@@ -37,6 +42,9 @@ fittracker/
 │   └── .env.example
 │
 └── frontend/
+    ├── Dockerfile
+    ├── .dockerignore
+    ├── nginx.conf
     ├── src/
     │   ├── api/
     │   ├── context/
@@ -56,6 +64,63 @@ fittracker/
 - **Python** 3.11+
 - **Node.js** 18+
 - **MySQL** 8.0
+- **Docker** & **Docker Compose** (for containerized setup)
+
+---
+
+## 🐳 Docker Setup (Recommended)
+
+The fastest way to get FitTracker running — no need to install Python, Node.js, or MySQL locally.
+
+### Prerequisites
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (includes Docker Compose)
+
+### Quick Start
+```bash
+# Clone the repo
+git clone https://github.com/your-username/fittracker.git
+cd fittracker
+
+# Start all services (MySQL + Backend + Frontend)
+docker compose up --build
+```
+
+Once all containers are healthy:
+- 🌐 **Frontend:** [http://localhost:3000](http://localhost:3000)
+- 🔌 **Backend API:** [http://localhost:5000/api/health](http://localhost:5000/api/health)
+- 🗄️ **MySQL:** `localhost:3306`
+
+> The backend automatically runs database migrations on first startup.
+
+### Useful Commands
+```bash
+# Start in detached mode (background)
+docker compose up -d --build
+
+# View logs
+docker compose logs -f              # all services
+docker compose logs -f backend      # backend only
+
+# Stop all services
+docker compose down
+
+# Stop and remove all data (reset database)
+docker compose down -v
+
+# Rebuild a single service
+docker compose build backend
+docker compose up -d backend
+```
+
+### Configuration
+Edit `.env.docker` to customize credentials and settings:
+```bash
+# Copy the template and edit
+cp .env.docker .env.docker.local
+# Then update docker-compose.yml env_file to point to .env.docker.local
+```
+
+> **Important:** Change `SECRET_KEY`, `JWT_SECRET_KEY`, and `MYSQL_ROOT_PASSWORD` before deploying to production.
 
 ---
 
@@ -204,6 +269,15 @@ Open browser → **http://localhost:5173**
 ---
 
 ## 🏭 Production Deployment
+
+### With Docker (Recommended)
+```bash
+# Update .env.docker with production secrets, then:
+docker compose up -d --build
+```
+The Docker setup already uses Gunicorn for the backend and Nginx for the frontend.
+
+### Without Docker
 - Backend: **Gunicorn**
 - Frontend: `npm run build` → Serve `dist/` folder
 - Recommended: **Nginx** as reverse proxy
