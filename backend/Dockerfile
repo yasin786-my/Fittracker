@@ -4,9 +4,9 @@ FROM python:3.11-slim AS runtime
 # System deps required by mysqlclient (C extension)
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        default-libmysqlclient-dev \
-        gcc \
-        pkg-config && \
+    default-libmysqlclient-dev \
+    gcc \
+    pkg-config && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -25,17 +25,7 @@ ENV FLASK_APP=run.py \
 EXPOSE 5000
 
 # Entrypoint: run migrations then start Gunicorn
-COPY <<'EOF' /entrypoint.sh
-#!/bin/bash
-set -e
-
-echo "⏳ Running database migrations..."
-flask db upgrade 2>/dev/null || flask db init && flask db migrate -m "initial" && flask db upgrade
-
-echo "🚀 Starting Gunicorn on port 5000..."
-exec gunicorn --bind 0.0.0.0:5000 --workers 4 --timeout 120 "run:app"
-EOF
-
+COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
