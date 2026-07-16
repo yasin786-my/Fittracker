@@ -40,7 +40,14 @@ frontend/pnpm-debug.log*
 *.sql
 *.sqlite3
 
+# --- Docker ---
+mysql_data/
+.env.docker
+
 # --- System & IDE ---
 .python-version
 .ipynb_checkpoints
 .history/
+graphify-out/
+.agents/
+

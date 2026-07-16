@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+*.pyo
+venv/
+env/
+ENV/
+.env
+.env.local
+.pytest_cache/
+*.db
+instance/
+migrations/__pycache__/
+.git/
+.gitignore
+Dockerfile
+.dockerignore
