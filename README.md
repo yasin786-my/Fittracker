@@ -23,7 +23,7 @@
 ```
 fittracker/
 ├── docker-compose.yml
-├── .env.docker
+├── .env.docker.example
 ├── backend/
 │   ├── Dockerfile
 │   ├── .dockerignore
@@ -81,9 +81,15 @@ The fastest way to get FitTracker running — no need to install Python, Node.js
 git clone https://github.com/your-username/fittracker.git
 cd fittracker
 
+# (Optional) Customize environment variables
+cp .env.docker.example .env.docker
+# Edit .env.docker with your own secrets/credentials
+
 # Start all services (MySQL + Backend + Frontend)
 docker compose up --build
 ```
+
+> **Note:** The app works out-of-the-box with sensible defaults — no `.env.docker` file required for local development. Only create one if you need to customize credentials.
 
 Once all containers are healthy:
 - 🌐 **Frontend:** [http://localhost:3000](http://localhost:3000)
@@ -113,11 +119,10 @@ docker compose up -d backend
 ```
 
 ### Configuration
-Edit `.env.docker` to customize credentials and settings:
+To customize credentials and settings, copy the example file:
 ```bash
-# Copy the template and edit
-cp .env.docker .env.docker.local
-# Then update docker-compose.yml env_file to point to .env.docker.local
+cp .env.docker.example .env.docker
+# Edit .env.docker with your values
 ```
 
 > **Important:** Change `SECRET_KEY`, `JWT_SECRET_KEY`, and `MYSQL_ROOT_PASSWORD` before deploying to production.
